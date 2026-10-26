@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f8f5ef">
+<meta name="description" content="絹彩喜（きさき）。繭に含まれるセリシンの保湿成分に着目した完全無添加の化粧品。">
+<title>絹彩喜（きさき）｜肌の弱さをあきらめの理由にさせない。</title>
+<style>
+/* ==================================================
+   【編集ガイド】色を変えるときは、まずこの下の :root を編集
+   例：--bg はページ背景、--ink は基本文字色です。
+   ================================================== */
+:root{--bg:#faf8f3;--sand:#eee6da;--ink:#39332c;--muted:#756b5e;--gold:#a58d6b;--line:#ded4c6;--white:#fffdf9}
+/* 基本設定 */
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:78px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif;line-height:1.95;letter-spacing:.035em}
+a{color:inherit;text-decoration:none}a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offset:4px}
+.wrap{width:min(1120px,calc(100% - 44px));margin:auto}
+/* ヘッダーとメニュー */
+header{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 max(22px,calc((100vw - 1280px)/2));position:sticky;top:0;z-index:5;background:rgba(250,248,243,.96);backdrop-filter:blur(10px);border-bottom:1px solid #d8cbbb80}
+.brand{display:flex;align-items:center;gap:10px}.mark{font-size:28px;color:var(--gold)}.brand-name{font-size:25px;letter-spacing:.2em}.kana{font-size:10px;color:var(--muted);letter-spacing:.3em}
+nav{display:flex;gap:clamp(12px,2vw,27px);font-size:12px}nav a{border-bottom:1px solid transparent}nav a:hover{border-color:var(--gold)}
+.menu{display:none;border:1px solid var(--line);background:none;padding:7px 10px;color:var(--ink)}
+/* トップページのメイン画像・見出し */
+.hero{min-height:510px;position:relative;display:flex;align-items:center;background:#e9e2d5;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(250,247,240,.98) 0%,rgba(250,247,240,.88) 36%,rgba(250,247,240,.15) 74%),url("hero.jpg") center right/cover no-repeat}
+.hero-inner{position:relative;width:min(1120px,calc(100% - 44px));margin:auto;padding:72px 0}
+.eyebrow{font-size:11px;color:var(--gold);letter-spacing:.24em;text-transform:uppercase}
+h1{font-size:clamp(34px,4.5vw,57px);font-weight:500;line-height:1.55;letter-spacing:.12em;margin:16px 0}
+.hero p{font-size:14px;color:#5d554a;max-width:445px}
+.btn{display:inline-flex;gap:24px;align-items:center;padding:10px 19px;border:1px solid var(--gold);font-size:12px;margin-top:14px;transition:.2s}
+.btn:hover{background:var(--ink);border-color:var(--ink);color:white}
+/* 各セクションの共通設定 */
+section{padding:75px 0}.heading{display:flex;gap:18px;align-items:baseline;margin-bottom:26px}.heading h2{font-size:26px;font-weight:500;letter-spacing:.12em;margin:0}.heading span{font-size:10px;color:var(--gold);letter-spacing:.2em}
+/* 絹彩喜について */
+.about-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:55px;align-items:center}
+.art{min-height:330px;display:grid;place-items:center;background:linear-gradient(140deg,#dce2d2,#f2ecdf 60%,#d4c4ad);position:relative;overflow:hidden}
+.art:before{content:"";width:200px;height:250px;border:1px solid #ffffffa8;border-radius:50%;position:absolute;transform:rotate(28deg)}.art span{font-size:110px;color:#718265a8;transform:rotate(-20deg)}
+.copy p,.activity p{font-size:14px;color:var(--muted)}
+/* チーム紹介 */
+.team{background:#f0ebe2}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:42px;align-items:center}
+.team-number{font-size:70px;line-height:1;color:var(--gold);letter-spacing:.05em}.team-number small{font-size:17px;letter-spacing:.12em}
+.team-card{border-top:1px solid var(--gold);padding-top:18px}
+/* 商品紹介 */
+.products{background:#f8f5ef}
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.product-card{background:var(--white);padding:20px;border:1px solid #e9e1d6}
+.product-art{height:225px;background:linear-gradient(145deg,#eee7dc,#fbf9f4);display:grid;place-items:center}
+.bottle{height:150px;width:62px;border-radius:11px 11px 7px 7px;background:linear-gradient(90deg,#d8cbb7,#fffdf8 48%,#e5d9c8);border:1px solid #d7c9b5;position:relative;box-shadow:10px 15px 20px #88796322}
+.bottle:before{content:"";position:absolute;top:-23px;left:12px;width:36px;height:25px;background:linear-gradient(90deg,#b69b70,#e8d6b4,#b69b70);border-radius:4px 4px 1px 1px}
+.bottle:after{content:"絹彩喜";position:absolute;top:62px;left:0;right:0;text-align:center;font-size:10px;color:#8d785a}
+.jar{width:130px;height:80px;border-radius:9px 9px 20px 20px;background:linear-gradient(90deg,#d8cbb7,#fffdf8 48%,#e5d9c8);position:relative;box-shadow:10px 15px 20px #88796322}
+.jar:before{content:"";position:absolute;top:-17px;left:-4px;width:138px;height:22px;border-radius:4px;background:linear-gradient(90deg,#b69b70,#e8d6b4,#b69b70)}
+.jar:after{content:"絹彩喜";position:absolute;top:30px;left:0;right:0;text-align:center;font-size:11px;color:#8d785a}
+.product-card h3{font-size:20px;font-weight:500;margin:16px 0 4px}.product-card p{font-size:13px;color:var(--muted);margin:4px 0 12px}.tag{display:inline-block;border:1px solid var(--line);padding:3px 8px;font-size:10px;color:var(--muted);margin:3px 3px 0 0}
+.product-note{font-size:11px;color:#84796b;margin-top:18px}
+/* 活動内容 */
+.activity-grid{display:grid;grid-template-columns:1fr 1fr;gap:45px;align-items:center}
+.landscape{min-height:290px;position:relative;overflow:hidden;background:linear-gradient(#d1dfe0 0%,#e6e5d8 48%,#aeb99a 49%,#71825f 72%,#d6c5a5 73%,#e9dfce 100%);display:flex;align-items:end;padding:20px}
+.mountain{position:absolute;left:0;right:0;top:45px;height:170px;background:#84968c;clip-path:polygon(0 90%,20% 35%,33% 65%,52% 0,72% 65%,87% 28%,100% 76%,100% 100%,0 100%);opacity:.8}
+.landscape label{position:relative;background:#faf8f3e8;padding:8px 12px;font-size:11px}
+/* 大切にしていること */
+.values{background:#eee7dc}.value-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.value{padding-top:16px;border-top:1px solid var(--gold)}.num{color:var(--gold);font-size:11px;letter-spacing:.16em}.value h3{font-weight:500;font-size:18px;margin:8px 0}.value p{font-size:13px;color:var(--muted);margin:0}
+/* 活動報告・お知らせ */
+.news{border-bottom:1px solid var(--line);padding:16px 0;display:grid;grid-template-columns:120px 1fr;font-size:13px}.news span:first-child{color:var(--gold)}
+/* お問い合わせ */
+.contact{text-align:center;background:#e9e0d4}.contact p{font-size:14px;color:var(--muted)}
+/* フッター */
+footer{background:#e2d8ca;padding:26px 0 18px}.foot-top{display:flex;justify-content:space-between;align-items:center;gap:20px}.foot-links{display:flex;gap:18px;flex-wrap:wrap;font-size:11px}.copyright{text-align:center;color:#82776a;font-size:10px;margin-top:25px}
+/* スマートフォン・タブレット向けレイアウト */
+@media(max-width:780px){header{height:68px}.brand-name{font-size:21px}.kana{display:none}.menu{display:block}nav{display:none;position:absolute;top:68px;left:0;right:0;background:var(--bg);padding:18px 24px;flex-direction:column;border-bottom:1px solid var(--line)}nav.open{display:flex}.hero{min-height:475px}.hero:before{background:linear-gradient(90deg,#faf7f0f5,#faf7f0c7 63%,#faf7f033),url("hero.jpg") center/cover no-repeat}.about-grid,.team-grid,/* 活動内容 */
+.activity-grid{grid-template-columns:1fr;gap:28px}.art{min-height:235px}.team-number{font-size:58px}.value-grid{grid-template-columns:1fr}.foot-top{align-items:flex-start;flex-direction:column}}
+@media(max-width:500px){.wrap,.hero-inner{width:calc(100% - 34px)}section{padding:52px 0}.hero-inner{padding:48px 0}h1{font-size:33px}.hero p{font-size:13px}.heading h2{font-size:22px}.product-grid{gap:10px}.product-card{padding:10px}.product-art{height:150px}.bottle{transform:scale(.82)}.jar{transform:scale(.82)}.product-card h3{font-size:17px}.product-card p{font-size:12px}.news{grid-template-columns:90px 1fr;gap:10px}}
+
+/* 活動報告：写真と余白を活かしたエディトリアルカード */
+.report-section{background:#f5f0e9}.report-intro{max-width:620px;color:var(--muted);font-size:14px;margin:-5px 0 32px}.report-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.report-card{background:#fffdf9;border:1px solid #e9dfd3;overflow:hidden;transition:transform .25s,box-shadow .25s}.report-card:hover{transform:translateY(-5px);box-shadow:0 12px 28px #55432c16}.report-image{height:210px;overflow:hidden;background:#e5d9c9}.report-image img{width:100%;height:100%;object-fit:cover;transition:transform .3s}.report-card:hover .report-image img{transform:scale(1.035)}.report-copy{padding:23px}.report-meta{display:flex;align-items:center;gap:12px;font:11px Arial,sans-serif;color:#967d60;letter-spacing:.04em}.report-type{border:1px solid #d7c5b2;padding:4px 8px}.report-copy h3{font-size:19px;line-height:1.6;font-weight:500;margin:14px 0 9px}.report-copy p{font-size:13px;color:var(--muted);margin:0;line-height:1.9}.report-link{display:inline-block;margin-top:18px;padding-bottom:3px;border-bottom:1px solid var(--gold);font-size:12px}.report-placeholder{background:linear-gradient(135deg,#e4dbce,#f6f1e9);height:100%;display:grid;place-items:center;color:#9b8a75;font-size:13px;letter-spacing:.13em}.report-footnote{font-size:11px;color:var(--muted);margin-top:22px}
+@media(max-width:850px){.report-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.report-grid{grid-template-columns:1fr}.report-image{height:225px}}
+</style>
+</head>
+<body>
+<!-- ==================================================
+     絹彩喜ホームページ：かんたん編集ガイド
+     文章を変える：下の「トップページ」「絹彩喜について」などを探す
+     色を変える：上の <style> 内にある「編集ガイド」を探す
+     保存：Ctrl + S ／ 表示更新：ブラウザで Ctrl + R
+     ※ <h1> や <p> などのタグは、なるべく消さずに文章だけ変えます。
+     ================================================== -->
+
+<!-- ヘッダー：ロゴとページ内メニュー -->
+<header>
+<a class="brand" href="#home">
+<span class="mark">❧</span>
+<span class="brand-name">絹彩喜</span>
+<span class="kana">きさき</span>
+</a>
+<button class="menu" id="menuButton" aria-expanded="false" aria-controls="siteNav">メニュー ☰</button>
+<nav id="siteNav" aria-label="メインナビゲーション">
+<a href="#about">絹彩喜について</a>
+<a href="#team">私たち</a>
+<a href="#products">商品紹介</a>
+<a href="#activities">活動内容</a>
+<a href="#contact">お問い合わせ</a>
+</nav>
+</header>
+<main>
+<!-- トップページ：最初に見える大きな見出しと説明 -->
+<section class="hero" id="home">
+<div class="hero-inner">
+<div class="eyebrow">Silk · Skin care · Gunma</div>
+<h1>肌と地域に、<br>彩りを。</h1>
+<p>群馬県産シルクに着目し、肌へのやさしさと地域の魅力を伝える。<br>絹彩喜（きさき）は、学生4人の視点からスキンケアの可能性を考える事業チームです。</p>
+<a class="btn" href="#about">絹彩喜について知る <span>→</span>
+</a>
+</div>
+</section>
+
+<!-- 絹彩喜について：チームの紹介文 -->
+<section id="about">
+<div class="wrap about-grid">
+<div class="art" role="img" aria-label="植物をイメージした装飾">
+<span>❧</span>
+</div>
+<div class="copy">
+<div class="heading">
+<h2>絹彩喜について</h2>
+<span>ABOUT US</span>
+</div>
+<p>絹彩喜（きさき）は、群馬県産シルクの魅力に着目し、スキンケア商品を通じて地域の価値を伝えることを目指す学生チームです。</p>
+<p>私たちは、商品を企画するだけでなく、肌の悩みや商品選びに向き合う人の視点を大切にしています。商品について分かりやすく伝え、安心して選ぶために役立つ情報を届けることを目指します。</p>
+<p>地域の企業と連携しながら、群馬県の資源やものづくりの魅力を学び、事業としてどのように発信できるかを考えていきます。</p>
+</div>
+</div>
+</section>
+
+<!-- 私たちについて：メンバー数やチームの説明 -->
+<section class="team" id="team">
+<div class="wrap team-grid">
+<div>
+<div class="heading">
+<h2>私たちについて</h2>
+<span>OUR TEAM</span>
+</div>
+<div class="team-number">04 <small>MEMBERS</small>
+</div>
+<p style="color:var(--muted);font-size:13px">学生4人で取り組むプロジェクト</p>
+</div>
+<div class="team-card">
+<h3 style="font-size:20px;font-weight:500">学生の視点から、地域とスキンケアの可能性を考える。</h3>
+<p style="font-size:14px;color:var(--muted)">私たちは、学びや調査、企業との連携を通して、商品の企画や情報発信に取り組んでいます。活動の過程で得た気づきも大切にしながら、絹彩喜の目指す姿を少しずつ形にしていきます。</p>
+</div>
+</div>
+</section>
+
+<!-- 商品紹介：化粧水とクリーム -->
+<section id="products">
+<div class="wrap">
+<div class="heading">
+<h2>商品紹介</h2>
+<span>OUR PRODUCTS</span>
+</div>
+<p style="font-size:13px;color:var(--muted)">毎日のスキンケアに寄り添う、化粧水とクリームを企画しています。</p>
+<div class="product-grid">
+<article class="product-card">
+<div class="product-art" role="img" aria-label="化粧水の容器イメージ">
+<div class="bottle">
+</div>
+</div>
+<h3>化粧水</h3>
+<p>毎日の肌のお手入れに使う化粧水。商品仕様や使用方法など、正確な情報を分かりやすくお伝えします。</p>
+<span class="tag">15mL（企画サイズ）</span>
+<span class="tag">香りの種類を検討中</span>
+</article>
+<article class="product-card">
+<div class="product-art" role="img" aria-label="クリームの容器イメージ">
+<div class="jar">
+</div>
+</div>
+<h3>クリーム</h3>
+<p>化粧水と合わせたスキンケアを想定したクリーム。詳しい特徴や成分は、確定した商品情報に基づいてご案内します。</p>
+<span class="tag">5g（企画サイズ）</span>
+<span class="tag">香りの種類を検討中</span>
+</article>
+</div>
+<p class="product-note">※容器画像はデザイン確認用のイメージです。サイズはこれまでの企画内容に基づくもので、販売仕様・価格・成分・香りの最終決定を示すものではありません。</p>
+</div>
+</section>
+
+<!-- 活動内容：群馬県についての調査など -->
+<section id="activities">
+<div class="wrap activity-grid">
+<div class="landscape" role="img" aria-label="群馬の自然をイメージした風景">
+<div class="mountain">
+</div>
+<label>地域の魅力を知り、伝える。</label>
+</div>
+<div class="activity">
+<div class="heading">
+<h2>活動内容</h2>
+<span>ACTIVITIES</span>
+</div>
+<p>絹彩喜では、事業や商品の企画に加え、群馬県の魅力を知り、地域資源やものづくりについて学ぶ活動にも取り組んでいます。</p>
+<p>社内会議では群馬県の名産品や魅力について意見を出し合い、地域への理解を深めるため、県内の観光地などを訪問することも計画しています。</p>
+<p>今後は、活動報告を通じて取り組みの進捗や学んだことを発信していきます。</p>
+</div>
+</div>
+</section>
+
+<!-- 大切にしていること：事業で重視する3つの考え方 -->
+<section class="values">
+<div class="wrap">
+<div class="heading">
+<h2>大切にしていること</h2>
+<span>OUR VALUES</span>
+</div>
+<div class="value-grid">
+<article class="value">
+<div class="num">01 / SKINCARE</div>
+<h3>使う人の視点</h3>
+<p>商品を選ぶ人が知りたい情報を考え、分かりやすく誠実に伝えます。</p>
+</article>
+<article class="value">
+<div class="num">02 / SILK</div>
+<h3>シルクの可能性</h3>
+<p>群馬県産シルクに着目し、その魅力をスキンケアの企画に生かすことを目指します。</p>
+</article>
+<article class="value">
+<div class="num">03 / GUNMA</div>
+<h3>地域との連携</h3>
+<p>地域の企業や資源について学び、群馬県の魅力を伝える方法を考えます。</p>
+</article>
+</div>
+</div>
+</section>
+
+<!-- 活動報告：記事を増やすときは report-card を複製してください -->
+<section class="report-section" id="news">
+<div class="wrap">
+<div class="heading"><h2>活動報告</h2><span>OUR JOURNAL</span></div>
+<p class="report-intro">私たちが日々取り組んでいること。商品開発や会議、地域との出会いなど、絹彩喜の歩みをお届けします。</p>
+<div class="report-grid">
+<article class="report-card">
+<a href="reports/2026-05-22.html" aria-label="5月22日の活動報告を読む"><div class="report-image"><img src="images/meeting.jpg" alt="会議のイメージ画像"></div></a>
+<div class="report-copy"><div class="report-meta"><time datetime="2026-05-22">2026.05.22</time><span class="report-type">社内会議</span></div>
+<h3>群馬県の魅力について話し合いました</h3><p>群馬県の名産品や魅力を共有し、地域について理解を深めるための視察を計画しました。</p>
+<a class="report-link" href="reports/2026-05-22.html">記事を読む　→</a></div>
+</article>
+<article class="report-card"><div class="report-image"><div class="report-placeholder">COMING SOON</div></div><div class="report-copy"><div class="report-meta"><span>次回更新予定</span><span class="report-type">商品開発</span></div><h3>商品開発の活動報告</h3><p>試作や話し合いなど、商品づくりの過程を今後ご紹介します。</p></div></article>
+<article class="report-card"><div class="report-image"><div class="report-placeholder">COMING SOON</div></div><div class="report-copy"><div class="report-meta"><span>次回更新予定</span><span class="report-type">地域活動</span></div><h3>地域での取り組み</h3><p>視察やイベントでの活動など、地域とのつながりを発信していきます。</p></div></article>
+</div>
+<p class="report-footnote">※画像は仮のイメージです。公開時には実際の活動写真に差し替えてください。</p>
+</div>
+</section>
+
+<!-- お問い合わせ：正式な連絡先が決まったら更新 -->
+<section class="contact" id="contact">
+<div class="wrap">
+<div class="eyebrow">CONTACT</div>
+<h2 style="font-weight:500;letter-spacing:.12em">お問い合わせ</h2>
+<p>絹彩喜の事業や商品についてのお問い合わせ先を、公開時にこちらへ掲載します。</p>
+<p style="font-size:12px">メールアドレスなどの連絡先は、正式な情報が決まり次第追加します。</p>
+</div>
+</section>
+</main>
+
+<!-- フッター：ページ下部のリンクと著作権表示 -->
+<footer>
+<div class="wrap">
+<div class="foot-top">
+<a class="brand" href="#home">
+<span class="mark">❧</span>
+<span class="brand-name">絹彩喜</span>
+<span class="kana">きさき</span>
+</a>
+<div class="foot-links">
+<a href="#about">絹彩喜について</a>
+<a href="#products">商品紹介</a>
+<a href="#activities">活動内容</a>
+<a href="#contact">お問い合わせ</a>
+</div>
+</div>
+<div class="copyright">© <span id="year">
+</span> 絹彩喜（きさき）</div>
+</div>
+</footer>
+<!-- メニューの開閉と、現在の年を自動表示する処理。通常は編集不要です。 -->
+<script>
+const b=document.getElementById('menuButton'),n=document.getElementById('siteNav');b.addEventListener('click',()=>{let o=n.classList.toggle('open');b.setAttribute('aria-expanded',String(o))});n.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{n.classList.remove('open');b.setAttribute('aria-expanded','false')}));document.getElementById('year').textContent=new Date().getFullYear();</script>
+</body>
+</html>
