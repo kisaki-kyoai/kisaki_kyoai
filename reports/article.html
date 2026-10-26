@@ -124,11 +124,41 @@
   const content = document.createElement("div");
   content.className = "article-content";
 
-  (article.body || []).forEach(text => {
-    const p = document.createElement("p");
-    p.textContent = text;
-    content.appendChild(p);
+
+  (article.body || []).forEach(item => {
+    if (typeof item === "string") {
+      const p = document.createElement("p");
+      p.textContent = item;
+      content.appendChild(p);
+
+    } else if (item.image) {
+      const figure = document.createElement("figure");
+      figure.style.margin = "28px 0";
+
+      const img = document.createElement("img");
+      img.src = item.image;
+      img.alt = item.caption || "活動写真";
+      img.style.width = "100%";
+      img.style.height = "auto";
+      img.style.display = "block";
+      img.style.borderRadius = "4px";
+
+      figure.appendChild(img);
+
+      if (item.caption) {
+        const caption = document.createElement("figcaption");
+        caption.textContent = item.caption;
+        caption.style.textAlign = "center";
+        caption.style.fontSize = "12px";
+        caption.style.color = "#9b8668";
+        caption.style.marginTop = "10px";
+        figure.appendChild(caption);
+      }
+
+      content.appendChild(figure);
+    }
   });
+
 
   container.appendChild(content);
 })();
