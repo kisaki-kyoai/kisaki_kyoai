@@ -80,7 +80,7 @@ window.kisakiArticles = [
     category: "企業提携",
     title: "株式会社ラヴィドール様と正式に提携しました！",
     description: "シルクを活かした化粧品づくりに取り組む株式会社ラヴィドール様と提携し、商品企画を進めています。",
-    image: "",
+image: "images/lavidor-logo.png",
     body: [
       "こんにちは！絹彩喜（きさき）です！",
       "7月24日に、株式会社ラヴィドール様と正式に提携しました！",
