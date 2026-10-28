@@ -135,3 +135,5 @@ window.kisakiArticles = [
     ]
   }
 ];
+<p class="text-right"><img src="img/project.png">　<span style="padding-top:5px;"><input type="button" class="btn btn-danger btn-lg" value="応援したい！"  disabled onclick="submit();"></span>　<span style="color:red;font-size:1em;vertical-align: middle;">現在</span> <span style="color:red;font-size:1.5em;vertical-align: middle;">261</span> <span style="color:red;font-size:1em;vertical-align: middle;">人</span></p>
+						</form>
