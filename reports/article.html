@@ -5,39 +5,47 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>活動報告｜絹彩喜</title>
+
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       background: #faf8f4;
       color: #38342e;
       font-family: "Yu Gothic", "Meiryo", sans-serif;
     }
+
     header {
       padding: 24px 6%;
       background: #fffdf9;
       border-bottom: 1px solid #e7ded1;
     }
+
     header a {
       color: #786346;
       text-decoration: none;
       font-size: 17px;
     }
+
     main {
       max-width: 800px;
       margin: 65px auto;
       padding: 0 24px;
     }
+
     .category {
       color: #9b8668;
       font-size: 13px;
       letter-spacing: .06em;
     }
+
     h1 {
       font-size: 30px;
       line-height: 1.5;
       margin: 16px 0 35px;
     }
+
     .article-image {
       display: block;
       width: 100%;
@@ -45,25 +53,105 @@
       object-fit: cover;
       margin-bottom: 35px;
     }
+
     .article-content {
       background: #fffdf9;
       border: 1px solid #e7ded1;
       padding: 35px;
     }
+
     .article-content p {
       font-size: 15px;
       line-height: 2.1;
       margin: 0 0 22px;
     }
+
     .article-content p:last-child {
       margin-bottom: 0;
     }
+
     .back {
       display: inline-block;
       margin-top: 35px;
       color: #786346;
       text-decoration: none;
     }
+
+    /* 応援カウンター */
+    .reaction-section {
+      margin-top: 35px;
+      padding: 32px 24px;
+      background: #fffdf9;
+      border: 1px solid #e7ded1;
+      text-align: center;
+    }
+
+    .reaction-section[hidden] {
+      display: none;
+    }
+
+    .reaction-title {
+      margin: 0 0 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .reaction-message {
+      margin: 0 0 24px;
+      font-size: 13px;
+      line-height: 1.8;
+      color: #786346;
+    }
+
+    .reaction-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    #reaction-button {
+      padding: 13px 30px;
+      border: 1px solid #a18a68;
+      border-radius: 30px;
+      background: #fffdf9;
+      color: #786346;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+
+    #reaction-button:hover:not(:disabled) {
+      background: #f4eee5;
+    }
+
+    #reaction-button:active:not(:disabled) {
+      transform: scale(.96);
+    }
+
+    #reaction-button:disabled {
+      opacity: .5;
+      cursor: wait;
+    }
+
+    .reaction-count {
+      color: #786346;
+      font-size: 14px;
+    }
+
+    .reaction-count strong {
+      font-size: 22px;
+    }
+
+    .reaction-status {
+      min-height: 18px;
+      margin: 15px 0 0;
+      font-size: 12px;
+      color: #9b8668;
+    }
+
     @media(max-width:700px) {
       main { margin: 40px auto; }
       h1 { font-size: 25px; }
@@ -71,6 +159,7 @@
     }
   </style>
 </head>
+
 <body>
 
 <header>
@@ -80,12 +169,47 @@
 <main>
   <div id="article"></div>
 
+  <section
+    class="reaction-section"
+    id="reaction-section"
+    hidden
+  >
+    <p class="reaction-title">この記事を応援する</p>
+
+    <p class="reaction-message">
+      皆さまの応援が、私たちの活動の励みになります！
+    </p>
+
+    <div class="reaction-controls">
+      <button
+        type="button"
+        id="reaction-button"
+        disabled
+      >
+        ♡ 応援する
+      </button>
+
+      <span class="reaction-count">
+        <strong id="reaction-count">--</strong> 件
+      </span>
+    </div>
+
+    <p
+      id="reaction-status"
+      class="reaction-status"
+      role="status"
+    >
+      読み込み中...
+    </p>
+  </section>
+
   <a class="back" href="index.html">
     ← 活動報告一覧に戻る
   </a>
 </main>
 
 <script src="articles.js"></script>
+
 <script>
 (function () {
   const id = new URLSearchParams(
@@ -124,7 +248,6 @@
   const content = document.createElement("div");
   content.className = "article-content";
 
-
   (article.body || []).forEach(item => {
     if (typeof item === "string") {
       const p = document.createElement("p");
@@ -159,9 +282,124 @@
     }
   });
 
-
   container.appendChild(content);
 })();
+</script>
+
+<!-- Firebase 応援カウンター -->
+<script type="module">
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+
+import {
+  getDatabase,
+  ref,
+  onValue,
+  runTransaction
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+import {
+  getAuth,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDOlgN4L5-IbHr6VIVe1JHNcz3sSZUCLgE",
+  authDomain: "kisaki-hp.firebaseapp.com",
+  databaseURL: "https://kisaki-hp-default-rtdb.firebaseio.com",
+  projectId: "kisaki-hp",
+  storageBucket: "kisaki-hp.firebasestorage.app",
+  messagingSenderId: "483970469361",
+  appId: "1:483970469361:web:12c6b35ae660112090c850",
+  measurementId: "G-60B94TE381"
+};
+
+const articleId = new URLSearchParams(
+  window.location.search
+).get("id");
+
+const articleExists = (window.kisakiArticles || [])
+  .some(article => article.id === articleId);
+
+if (articleExists) {
+  const section = document.getElementById("reaction-section");
+  const button = document.getElementById("reaction-button");
+  const count = document.getElementById("reaction-count");
+  const status = document.getElementById("reaction-status");
+
+  section.hidden = false;
+
+  async function initializeReactions() {
+    try {
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+      const auth = getAuth(app);
+
+      const reactionRef = ref(
+        database,
+        "reactions/" + articleId
+      );
+
+      onValue(
+        reactionRef,
+        snapshot => {
+          const value = snapshot.val();
+          count.textContent =
+            (typeof value === "number" ? value : 0)
+              .toLocaleString("ja-JP");
+        },
+        error => {
+          status.textContent =
+            "応援回数を読み込めませんでした。";
+          button.disabled = true;
+          console.error(error);
+        }
+      );
+
+      await signInAnonymously(auth);
+
+      button.disabled = false;
+      status.textContent = "何度でも応援できます！";
+
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        status.textContent = "応援を送信中...";
+
+        try {
+          const result = await runTransaction(
+            reactionRef,
+            current => {
+              return (current || 0) + 1;
+            }
+          );
+
+          if (result.committed) {
+            status.textContent =
+              "応援ありがとうございます！";
+          } else {
+            status.textContent =
+              "送信できませんでした。";
+          }
+
+        } catch (error) {
+          status.textContent =
+            "送信できませんでした。もう一度お試しください。";
+          console.error(error);
+
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+    } catch (error) {
+      status.textContent =
+        "応援機能を利用できません。";
+      console.error(error);
+    }
+  }
+
+  initializeReactions();
+}
 </script>
 
 </body>
