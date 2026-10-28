@@ -133,7 +133,7 @@
 
     #reaction-button:disabled {
       opacity: .5;
-      cursor: wait;
+      cursor: not-allowed;
     }
 
     .reaction-count {
@@ -254,7 +254,7 @@
       p.textContent = item;
       content.appendChild(p);
 
-    } else if (item.image) {
+    } else if (item && item.image) {
       const figure = document.createElement("figure");
       figure.style.margin = "28px 0";
 
@@ -285,7 +285,6 @@
   container.appendChild(content);
 })();
 </script>
-
 
 <!-- Firebase 応援カウンター -->
 <script type="module">
@@ -330,7 +329,7 @@ if (articleExists) {
 
   section.hidden = false;
 
-  // 1時間のクールタイム（画面には表示しない）
+  // クールタイムは1時間
   const COOLDOWN_MS = 3600 * 1000;
   const storageKey = "kisaki_reaction_cooldown_" + articleId;
 
@@ -375,17 +374,17 @@ if (articleExists) {
     }
   }
 
-  // 時間が経過したら自動的にボタンを戻す
+  // 自動的にボタンの状態を更新
   setInterval(updateButton, 1000);
 
-  // ページに戻ったときも状態を更新
+  // ページを再表示したときに状態を更新
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) {
       updateButton();
     }
   });
 
-  // 同じブラウザの別タブで応援した場合も反映
+  // 同じブラウザの別タブにも反映
   window.addEventListener("storage", event => {
     if (event.key === storageKey) {
       updateButton();
@@ -463,120 +462,6 @@ if (articleExists) {
       firebaseReady = false;
       button.disabled = true;
       status.textContent = "応援機能を利用できません。";
-      console.error(error);
-    }
-  }
-
-  initializeReactions();
-}
-</script>
-
-import { initializeApp } from
-  "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-
-import {
-  getDatabase,
-  ref,
-  onValue,
-  runTransaction
-} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
-
-import {
-  getAuth,
-  signInAnonymously
-} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyDOlgN4L5-IbHr6VIVe1JHNcz3sSZUCLgE",
-  authDomain: "kisaki-hp.firebaseapp.com",
-  databaseURL: "https://kisaki-hp-default-rtdb.firebaseio.com",
-  projectId: "kisaki-hp",
-  storageBucket: "kisaki-hp.firebasestorage.app",
-  messagingSenderId: "483970469361",
-  appId: "1:483970469361:web:12c6b35ae660112090c850",
-  measurementId: "G-60B94TE381"
-};
-
-const articleId = new URLSearchParams(
-  window.location.search
-).get("id");
-
-const articleExists = (window.kisakiArticles || [])
-  .some(article => article.id === articleId);
-
-if (articleExists) {
-  const section = document.getElementById("reaction-section");
-  const button = document.getElementById("reaction-button");
-  const count = document.getElementById("reaction-count");
-  const status = document.getElementById("reaction-status");
-
-  section.hidden = false;
-
-  async function initializeReactions() {
-    try {
-      const app = initializeApp(firebaseConfig);
-      const database = getDatabase(app);
-      const auth = getAuth(app);
-
-      const reactionRef = ref(
-        database,
-        "reactions/" + articleId
-      );
-
-      onValue(
-        reactionRef,
-        snapshot => {
-          const value = snapshot.val();
-          count.textContent =
-            (typeof value === "number" ? value : 0)
-              .toLocaleString("ja-JP");
-        },
-        error => {
-          status.textContent =
-            "応援回数を読み込めませんでした。";
-          button.disabled = true;
-          console.error(error);
-        }
-      );
-
-      await signInAnonymously(auth);
-
- button.disabled = false;
-      status.textContent = "応援よろしくお願いします！";  
-
-      button.addEventListener("click", async () => {
-        button.disabled = true;
-        status.textContent = "応援を送信中...";
-
-        try {
-          const result = await runTransaction(
-            reactionRef,
-            current => {
-              return (current || 0) + 1;
-            }
-          );
-
-          if (result.committed) {
-            status.textContent =
-              "応援ありがとうございます！";
-          } else {
-            status.textContent =
-              "送信できませんでした。";
-          }
-
-        } catch (error) {
-          status.textContent =
-            "送信できませんでした。もう一度お試しください。";
-          console.error(error);
-
-        } finally {
-          button.disabled = false;
-        }
-      });
-
-    } catch (error) {
-      status.textContent =
-        "応援機能を利用できません。";
       console.error(error);
     }
   }
