@@ -181,6 +181,29 @@ footer{background:#e9e0d4;padding:40px 0;text-align:center}
   .profile th{width:120px}
   .partner{padding:23px}
 }
+
+/* ヘッダー内のアクセスカウンター */
+.bar{gap:12px}
+.bar > .logo{flex-shrink:0}
+.bar > nav{margin-left:auto;gap:12px;justify-content:flex-end}
+.header-tools{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.header-counter{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:94px;padding:5px 7px;border:1px solid var(--line);background:#f5f0e8;border-radius:4px;line-height:1.2}
+.counter-label{font-size:10px;color:#88765c;white-space:nowrap;letter-spacing:.03em}
+.header-counter iframe{display:block;width:80px;height:24px;border:0;max-width:100%}
+@media(max-width:800px){
+  .bar > nav{margin-left:0;gap:17px;justify-content:flex-start}
+  .header-tools{margin-left:auto}
+}
+@media(max-width:520px){
+  .bar{gap:7px;min-height:76px}
+  .bar > .logo{gap:6px!important;font-size:21px;letter-spacing:.08em}
+  .bar > .logo img{width:36px!important;height:36px!important}
+  .header-tools{gap:6px}
+  .header-counter{min-width:78px;padding:4px 2px}
+  .counter-label{font-size:9px}
+  .header-counter iframe{width:72px;height:24px}
+  .menu{padding:7px 6px;font-size:11px;white-space:nowrap}
+}
 </style>
   
 </head>
@@ -208,7 +231,15 @@ footer{background:#e9e0d4;padding:40px 0;text-align:center}
   </span>
 
 </a>
-<button class="menu" id="menuButton" aria-expanded="false" aria-controls="siteNav">メニュー ☰</button><nav id="siteNav" aria-label="ページ内メニュー"><a href="#about">絹彩喜について</a><a href="#values">こだわり</a><a href="#product">商品紹介</a><a href="#story">開発ストーリー</a><a href="#partner">提携企業</a><a href="#reports">活動報告</a><a href="#company">会社概要</a></nav></div></header>
+<nav id="siteNav" aria-label="ページ内メニュー"><a href="#about">絹彩喜について</a><a href="#values">こだわり</a><a href="#product">商品紹介</a><a href="#story">開発ストーリー</a><a href="#partner">提携企業</a><a href="#reports">活動報告</a><a href="#company">会社概要</a></nav>
+<div class="header-tools">
+  <div class="header-counter" aria-label="累計アクセス数">
+    <span class="counter-label">累計アクセス数</span>
+    <iframe src="https://repo5.com/tool/freecounter/counter.cgi?ID=HLWEIWIUAM" width="80" height="24" title="アクセスカウンター" scrolling="no" loading="eager"></iframe>
+  </div>
+  <button class="menu" id="menuButton" aria-expanded="false" aria-controls="siteNav">メニュー ☰</button>
+</div>
+</div></header>
 <main>
 <section class="hero" id="home"><div class="wrap hero-inner"><div class="eyebrow">KISAKI — SILK SKINCARE PROJECT</div><h1>肌の弱さを、<br>あきらめの理由にさせない。</h1><p>肌が敏感だから。乾燥しやすいから。<br>そんな理由で、自分の好きなスキンケアをあきらめてほしくない。<br>私たち絹彩喜は、群馬のシルクに着目し、一人ひとりの肌の悩みや好みに寄り添う商品づくりに挑戦しています。</p><a class="link" href="#about">私たちの想いを知る →</a></div></section>
 <section id="about"><div class="wrap"><div class="heading"><span>ABOUT US</span><h2>絹彩喜について</h2></div><div class="prose"><p class="lead">自分に合ったスキンケアを、<br>もっと自由に選べるように。</p><p>私たち絹彩喜（きさき）は、共愛学園前橋国際大学の学生4人で活動する仮想企業です。</p><p>メンバーの中には、肌の状態を気にしたり、自分に合うスキンケア選びに悩んだりした経験のある人がいます。そうした身近な肌の悩みが、私たちの商品づくりの出発点になりました。</p><p>肌の悩みを抱える方にも、自分の好みに合ったスキンケアを楽しんでほしい。その想いから、群馬県にゆかりの深いシルクと、繭に含まれる天然のたんぱく質「セリシン」の保湿特性に着目しました。</p><p>私たちは化粧品開発の専門家ではありません。だからこそ、使う人に近い学生の視点を大切にし、地域企業の知識や経験を学びながら商品づくりに取り組んでいます。</p><p>肌の状態も、好みも、人それぞれ。一人ひとりが自分に合ったスキンケアを選べる機会を広げることが、私たちの目標です。</p></div></div></section>
@@ -463,18 +494,6 @@ footer{background:#e9e0d4;padding:40px 0;text-align:center}
 
 <script>const b=document.getElementById('menuButton'),n=document.getElementById('siteNav');b.addEventListener('click',()=>{const open=n.classList.toggle('open');b.setAttribute('aria-expanded',String(open))});n.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{n.classList.remove('open');b.setAttribute('aria-expanded','false')}));</script>
 
-<div style="text-align: center; padding: 20px 0; font-size: 12px; color: #8a7a64;">
-  <div style="margin-bottom: 6px;">累計アクセス数</div>
-  <iframe
-    src="https://repo5.com/tool/freecounter/counter.cgi?ID=HLWEIWIUAM"
-    width="80"
-    height="24"
-    frameborder="0"
-    scrolling="no"
-    title="アクセスカウンター"
-    style="border: none;">
-  </iframe>
-</div>
 
 </body>
 </html>
