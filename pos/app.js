@@ -57,6 +57,7 @@ async function stepUp() {
   const password = $('adminPassword');
   password.value = '';
   dialog.returnValue = '';
+  if (dialog.open) return false;
   dialog.showModal();
   await new Promise(resolve => dialog.addEventListener('close', resolve, {once: true}));
   const value = password.value;
@@ -113,7 +114,7 @@ $('logout').onclick = () => safeAction(async () => {
   await signOut(auth);
   notice('ログアウトしました');
 });
-$('back').onclick = () => { protectedAccess = false; show('home'); };
+$('back').onclick = () => show('home');
 onAuthStateChanged(auth, user => {
   if (user) {
     if (!loginInFlight && !logged) safeAction(() => restoreSession(user));
@@ -128,7 +129,13 @@ onAuthStateChanged(auth, user => {
   $('operator').value = '';
   show('login');
 });
-document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>safeAction(async()=>{const p=b.dataset.page;if(!protectedPages.includes(p))protectedAccess=false;if(protectedPages.includes(p)){protectedAccess=false;if(!await stepUp())return}show(p)}));
+document.querySelectorAll('[data-page]').forEach(button => {
+  button.onclick = () => safeAction(async () => {
+    const target = button.dataset.page;
+    if (protectedPages.includes(target) && !protectedAccess && !await stepUp()) return;
+    show(target);
+  });
+});
 async function refreshPage(){try{if(page==='pos')await refreshPos();if(page==='stock')await refreshStock();if(page==='sales')await refreshSales();if(page==='production')await refreshProduction();if(page==='consignment')await refreshConsignment();if(page==='expenses')await refreshExpenses();if(page==='settings')await refreshOperators();if(page==='admin')await refreshFinancials()}catch(e){notice(e.message,true)}}
 async function refreshFinancials() {
   const [sales, consignments, payments, expenses] = await Promise.all(
@@ -147,7 +154,18 @@ async function refreshFinancials() {
 }
 async function refreshHome(){try{const inventory=await records('inventory');const stats=[['自社在庫',inventory.reduce((n,x)=>n+(Number(x.qty)||0),0)+'個'],['売上・経費・入金','管理者認証後に各管理画面で確認']];$('stats').innerHTML=stats.map(([a,b])=>`<div class="panel"><div class="muted">${a}</div><strong>${b}</strong></div>`).join('')}catch(e){notice(e.message,true)}}
 const required=items=>{const result={};for(const x of items){const keys=x.kind==='set'?[id('lotion',x.s1),id('cream',x.s2)]:[id(x.kind,x.s1)];for(const k of keys)result[k]=(result[k]||0)+x.qty}return result};
-function drawScents(){for(const [box,current,change] of [['scent1',s1,v=>s1=v],['scent2',s2,v=>s2=v]]){$(box).innerHTML=scents.map(s=>`<button type="button" class="${s===current?'active':''}" data-scent="${esc(s)}">${s}</button>`).join('');$(box).querySelectorAll('button').forEach(b=>b.onclick=()=>{change(b.dataset.scent);drawScents();refreshPos()})}$('second').classList.toggle('hidden',kind!=='set');document.querySelectorAll('[data-kind]').forEach(b=>b.classList.toggle('active',b.dataset.kind===kind))}
+const scentFiles = {
+  'オレンジ': 'orange', 'ユーカリ': 'eucalyptus',
+  'ベルガモット': 'bergamot', 'ラベンダー': 'lavender'
+};
+function renderProductPhotos() {
+  const selections = kind === 'set' ? [['lotion', s1], ['cream', s2]] : [[kind, s1]];
+  $('productPhotos').innerHTML = selections.map(([product, scent]) => {
+    const name = kinds[product][0] + '・' + scent;
+    return `<figure><img src="./images/${product}-${scentFiles[scent]}.jpg" alt="${esc(name)}"><figcaption>${esc(name)}</figcaption></figure>`;
+  }).join('');
+}
+function drawScents(){renderProductPhotos();for(const [box,current,change] of [['scent1',s1,v=>s1=v],['scent2',s2,v=>s2=v]]){$(box).innerHTML=scents.map(s=>`<button type="button" class="${s===current?'active':''}" data-scent="${esc(s)}">${s}</button>`).join('');$(box).querySelectorAll('button').forEach(b=>b.onclick=()=>{change(b.dataset.scent);drawScents();refreshPos()})}$('second').classList.toggle('hidden',kind!=='set');document.querySelectorAll('[data-kind]').forEach(b=>b.classList.toggle('active',b.dataset.kind===kind))}
 document.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{kind=b.dataset.kind;drawScents();refreshPos()});
 function renderCart(){const displayedCart=pendingCheckout?.items??cart;const total=displayedCart.reduce((n,x)=>n+kinds[x.kind][1]*x.qty,0);$('cart').innerHTML=displayedCart.length?displayedCart.map((x,i)=>`<div class="flex line"><div>${kinds[x.kind][0]} ×${x.qty}<div class="muted">${esc(x.s1)} ${x.kind==='set'?'＋'+esc(x.s2):''}</div></div><button data-remove="${i}">削除</button></div>`).join(''):'<p class="muted">商品を選択してください</p>';$('cart').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{if(checkoutInFlight||pendingCheckout)return;cart.splice(Number(b.dataset.remove),1);renderCart()});$('total').textContent=yen(total);const cash=pendingCheckout?.cash??Number($('cash').value);$('change').textContent=!pendingCheckout&&$('cash').value===''?'お釣り：—':cash>=total?'お釣り：'+yen(cash-total):'不足：'+yen(total-cash);$('checkout').textContent=pendingCheckout?'同じ取引を再試行':'会計を確定';$('checkout').disabled=!canWrite||busy||checkoutInFlight||!navigator.onLine||(!pendingCheckout&&(!cart.length||!$('operator').value||!Number.isSafeInteger(cash)||cash<total));$('checkPending').disabled=!pendingCheckout||checkoutInFlight||!navigator.onLine;$('operator').disabled=Boolean(pendingCheckout)||checkoutInFlight;$('cash').disabled=Boolean(pendingCheckout)||checkoutInFlight;$('pendingInfo').textContent=pendingCheckout?'確認待ち：'+pendingCheckout.id+' ／ '+pendingCheckout.operator+' ／ お預かり '+yen(pendingCheckout.cash):''}
 $('cash').oninput=renderCart;document.querySelectorAll('[data-cash]').forEach(b=>b.onclick=()=>{if(pendingCheckout||checkoutInFlight)return;$('cash').value=b.dataset.cash==='exact'?cart.reduce((n,x)=>n+kinds[x.kind][1]*x.qty,0):b.dataset.cash;renderCart()});
