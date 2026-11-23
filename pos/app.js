@@ -77,19 +77,36 @@ async function stepUp() {
 
 $('loginForm').addEventListener('submit', event => {
   event.preventDefault();
-  safeAction(async () => {
+  void (async () => {
     if (loginInFlight) return;
     loginInFlight = true;
+    $('loginButton').disabled = true;
+    $('loginError').classList.remove('danger');
+    $('loginError').textContent = '認証を確認しています…';
     try {
       await setPersistence(auth, browserSessionPersistence);
       const result = await signInWithEmailAndPassword(auth, $('loginId').value.trim(), $('loginPw').value);
-      $('loginPw').value = '';
       await restoreSession(result.user);
+      $('loginPw').value = '';
+      $('loginError').textContent = '';
       notice('ログインしました');
+    } catch (error) {
+      const messages = {
+        'auth/invalid-credential': 'メールアドレスまたはパスワードを確認してください。',
+        'auth/wrong-password': 'パスワードを確認してください。',
+        'auth/user-not-found': 'Firebaseに登録されたメールアドレスを確認してください。',
+        'auth/network-request-failed': 'Firebaseとの通信に失敗しました。',
+        'auth/operation-not-allowed': 'Firebaseでメール／パスワード認証が無効になっています。',
+        'auth/too-many-requests': '試行回数が上限に達しました。時間をおいて試してください。'
+      };
+      $('loginError').textContent = (messages[error.code] || error.message || 'ログインに失敗しました。')
+        + (error.code ? '（' + error.code + '）' : '');
+      $('loginError').classList.add('danger');
     } finally {
       loginInFlight = false;
+      $('loginButton').disabled = false;
     }
-  });
+  })();
 });
 $('logout').onclick = () => safeAction(async () => {
   if (checkoutInFlight || busy) throw Error('保存終了後にログアウトしてください');
