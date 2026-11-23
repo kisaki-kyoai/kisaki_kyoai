@@ -1,1 +1,11 @@
-const CACHE='kisaki-pos-cache-v4';const ASSETS=["./", "./index.html", "./app.js", "./manifest.webmanifest", "./images/lotion-orange.jpg", "./images/lotion-eucalyptus.jpg", "./images/lotion-bergamot.jpg", "./images/lotion-lavender.jpg", "./images/cream-orange.jpg", "./images/cream-eucalyptus.jpg", "./images/cream-bergamot.jpg", "./images/cream-lavender.jpg"];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==location.origin)return;e.respondWith(caches.match(e.request).then(cached=>cached||fetch(e.request).then(res=>{if(res.ok){const copy=res.clone();caches.open(CACHE).then(c=>c.put(e.request,copy))}return res})))})
+self.addEventListener('install', event => {
+  event.waitUntil(self.skipWaiting());
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(key => key.startsWith('kisaki-pos-cache-')).map(key => caches.delete(key)));
+    await self.registration.unregister();
+  })());
+});

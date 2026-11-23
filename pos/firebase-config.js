@@ -1,0 +1,1 @@
+export const config={apiKey:'AIzaSyAAvQnS_1OjsLqP3tvgQx5esvr3iq4nHwQ',authDomain:'kisaki-management.firebaseapp.com',projectId:'kisaki-management',storageBucket:'kisaki-management.firebasestorage.app',messagingSenderId:'333689491178',appId:'1:333689491178:web:c22ade1bf1186fdef01193'};
