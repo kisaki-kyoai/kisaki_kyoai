@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>絹彩喜｜客面表示</title>
+<style>
+:root{font-family:system-ui,sans-serif;color:#292532;background:#f8f6f9}
+body{margin:0}header{background:#453a56;color:white;padding:18px 24px;font-weight:700}
+main{max-width:840px;margin:auto;padding:20px}
+section{background:white;border-radius:16px;padding:20px;margin-top:16px}
+ul{list-style:none;padding:0;margin:0}li,dl div{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #eee}
+dd{margin:0;text-align:right}dl{margin:0;font-size:clamp(18px,4vw,28px)}.total{font-size:clamp(25px,6vw,40px);font-weight:700}
+#status{margin:0;font-size:20px;font-weight:700}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header>絹彩喜｜お会計</header>
+<main>
+<p id="status" role="status">レジの「客面表示を開く」から接続してください。</p>
+<section id="receipt" hidden aria-label="お会計の明細">
+<ul id="items"></ul>
+<dl>
+<div class="total"><dt>合計</dt><dd id="total"></dd></div>
+<div><dt>お預かり金</dt><dd id="cash"></dd></div>
+<div><dt id="balanceLabel">お釣り</dt><dd id="balance"></dd></div>
+</dl>
+</section>
+</main>
+<script>
+const get = id => document.getElementById(id);
+const yen = new Intl.NumberFormat('ja-JP', {style:'currency', currency:'JPY'});
+const register = window.opener;
+
+window.addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== register
+      || event.data?.type !== 'kisaki-customer-state') return;
+  const state = event.data.state;
+  const hasItems = Boolean(state?.items.length);
+  get('receipt').hidden = !hasItems;
+  get('status').textContent = state?.confirmed ? 'お会計が完了しました。ありがとうございます。'
+    : hasItems ? 'お会計の明細' : '商品の入力をお待ちください。';
+  get('items').replaceChildren();
+  if (!hasItems) return;
+  for (const item of state.items) {
+    const row = document.createElement('li');
+    const name = document.createElement('span');
+    const amount = document.createElement('strong');
+    name.textContent = item.name + '（' + item.scent + '） × ' + item.quantity;
+    amount.textContent = yen.format(item.amount);
+    row.append(name, amount);
+    get('items').append(row);
+  }
+  get('total').textContent = yen.format(state.total);
+  get('cash').textContent = state.cash === null ? '—' : yen.format(state.cash);
+  const difference = state.cash === null ? null : state.cash - state.total;
+  get('balanceLabel').textContent = difference < 0 ? '不足額' : 'お釣り';
+  get('balance').textContent = difference === null ? '—' : yen.format(Math.abs(difference));
+});
+
+if (register) {
+  register.postMessage({type:'kisaki-customer-ready'}, location.origin);
+  const connection = setInterval(() => {
+    if (!register.closed) return;
+    clearInterval(connection);
+    get('receipt').hidden = true;
+    get('items').replaceChildren();
+    get('status').textContent = 'レジとの接続が終了しました。';
+  }, 1000);
+}
+</script>
+</body>
+</html>

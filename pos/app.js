@@ -9,6 +9,8 @@ const tables=['inventory','lots','sales','production','consignment','payments','
 let logged=false,protectedAccess=false,page='home',kind='set',s1=scents[0],s2=scents[1],cart=[],busy=false;
 let checkoutInFlight = false;
 let pendingCheckout = null;
+let customerWindow = null;
+let confirmedDisplay = null;
 let canWrite = false;
 let loginInFlight = false;
 
@@ -127,6 +129,8 @@ onAuthStateChanged(auth, user => {
   cart = [];
   $('cash').value = '';
   $('operator').value = '';
+  confirmedDisplay = null;
+  showCustomer(null);
   show('login');
 });
 document.querySelectorAll('[data-page]').forEach(button => {
@@ -158,20 +162,104 @@ const scentFiles = {
   'オレンジ': 'orange', 'ユーカリ': 'eucalyptus',
   'ベルガモット': 'bergamot', 'ラベンダー': 'lavender'
 };
-function renderProductPhotos() {
-  const selections = kind === 'set' ? [['lotion', s1], ['cream', s2]] : [[kind, s1]];
-  $('productPhotos').innerHTML = selections.map(([product, scent]) => {
-    const name = kinds[product][0] + '・' + scent;
-    return `<figure><img src="./images/${product}-${scentFiles[scent]}.jpg" alt="${esc(name)}"><figcaption>${esc(name)}</figcaption></figure>`;
-  }).join('');
+function drawScents() {
+  const primaryProduct = kind === 'cream' ? 'cream' : 'lotion';
+  $('firstScentLabel').textContent = kinds[primaryProduct][0] + 'の香り';
+  const groups = [
+    ['scent1', primaryProduct, s1, value => { s1 = value; }],
+    ['scent2', 'cream', s2, value => { s2 = value; }]
+  ];
+  for (const [id, product, selected, select] of groups) {
+    const box = $(id);
+    box.innerHTML = scents.map(scent => {
+      const active = scent === selected;
+      return `<button type="button" class="${active ? 'active' : ''}" aria-pressed="${active}" data-scent="${esc(scent)}"><img src="./images/${product}-${scentFiles[scent]}.jpg" alt=""><span>${esc(scent)}</span></button>`;
+    }).join('');
+    box.querySelectorAll('button').forEach(button => {
+      button.onclick = () => {
+        select(button.dataset.scent);
+        drawScents();
+        refreshPos();
+      };
+    });
+  }
+  $('second').classList.toggle('hidden', kind !== 'set');
+  document.querySelectorAll('[data-kind]').forEach(button => {
+    button.classList.toggle('active', button.dataset.kind === kind);
+  });
 }
-function drawScents(){renderProductPhotos();for(const [box,current,change] of [['scent1',s1,v=>s1=v],['scent2',s2,v=>s2=v]]){$(box).innerHTML=scents.map(s=>`<button type="button" class="${s===current?'active':''}" data-scent="${esc(s)}">${s}</button>`).join('');$(box).querySelectorAll('button').forEach(b=>b.onclick=()=>{change(b.dataset.scent);drawScents();refreshPos()})}$('second').classList.toggle('hidden',kind!=='set');document.querySelectorAll('[data-kind]').forEach(b=>b.classList.toggle('active',b.dataset.kind===kind))}
+
+function adjustQuantity(delta) {
+  const input = $('qty');
+  const current = input.valueAsNumber;
+  input.value = Math.max(Number(input.min), Math.min(Number(input.max),
+    Number.isFinite(current) ? Math.trunc(current) + delta : 1));
+}
+$('qtyMinus').onclick = () => adjustQuantity(-1);
+$('qtyPlus').onclick = () => adjustQuantity(1);
 document.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{kind=b.dataset.kind;drawScents();refreshPos()});
-function renderCart(){const displayedCart=pendingCheckout?.items??cart;const total=displayedCart.reduce((n,x)=>n+kinds[x.kind][1]*x.qty,0);$('cart').innerHTML=displayedCart.length?displayedCart.map((x,i)=>`<div class="flex line"><div>${kinds[x.kind][0]} ×${x.qty}<div class="muted">${esc(x.s1)} ${x.kind==='set'?'＋'+esc(x.s2):''}</div></div><button data-remove="${i}">削除</button></div>`).join(''):'<p class="muted">商品を選択してください</p>';$('cart').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{if(checkoutInFlight||pendingCheckout)return;cart.splice(Number(b.dataset.remove),1);renderCart()});$('total').textContent=yen(total);const cash=pendingCheckout?.cash??Number($('cash').value);$('change').textContent=!pendingCheckout&&$('cash').value===''?'お釣り：—':cash>=total?'お釣り：'+yen(cash-total):'不足：'+yen(total-cash);$('checkout').textContent=pendingCheckout?'同じ取引を再試行':'会計を確定';$('checkout').disabled=!canWrite||busy||checkoutInFlight||!navigator.onLine||(!pendingCheckout&&(!cart.length||!$('operator').value||!Number.isSafeInteger(cash)||cash<total));$('checkPending').disabled=!pendingCheckout||checkoutInFlight||!navigator.onLine;$('operator').disabled=Boolean(pendingCheckout)||checkoutInFlight;$('cash').disabled=Boolean(pendingCheckout)||checkoutInFlight;$('pendingInfo').textContent=pendingCheckout?'確認待ち：'+pendingCheckout.id+' ／ '+pendingCheckout.operator+' ／ お預かり '+yen(pendingCheckout.cash):''}
+function customerState(items, total, cash, confirmed = false) {
+  return {
+    items: items.map(item => ({
+      name: kinds[item.kind][0],
+      scent: item.kind === 'set' ? item.s1 + '／' + item.s2 : item.s1,
+      quantity: item.qty,
+      amount: kinds[item.kind][1] * item.qty
+    })),
+    total,
+    cash,
+    confirmed
+  };
+}
+
+function showCustomer(state) {
+  if (!customerWindow || customerWindow.closed) return;
+  customerWindow.postMessage({type: 'kisaki-customer-state', state}, location.origin);
+}
+
+$('openCustomer').onclick = () => {
+  customerWindow = window.open('./customer.html', 'kisaki-customer-display');
+  if (!customerWindow) {
+    notice('客面表示を開けませんでした。ブラウザのポップアップ設定を確認してください。', true);
+    return;
+  }
+  renderCart();
+};
+
+window.addEventListener('message', event => {
+  if (event.origin === location.origin && event.source === customerWindow
+      && event.data?.type === 'kisaki-customer-ready') renderCart();
+});
+
+$('cashKeypad').querySelectorAll('[data-cash-key]').forEach(button => {
+  button.onclick = () => {
+    const input = $('cash');
+    if (input.disabled) return;
+    const current = /^[0-9]+$/.test(input.value) ? input.value : '';
+    const key = button.dataset.cashKey;
+    if (key === 'clear') input.value = '';
+    else if (key === 'backspace') input.value = current.slice(0, -1);
+    else {
+      const next = Number(current + key);
+      if (!Number.isSafeInteger(next)) return;
+      input.value = String(next);
+    }
+    renderCart();
+  };
+});
+
+function renderCart(){const displayedCart=pendingCheckout?.items??cart;const total=displayedCart.reduce((n,x)=>n+kinds[x.kind][1]*x.qty,0);$('cart').innerHTML=displayedCart.length?displayedCart.map((x,i)=>`<div class="flex line"><div>${kinds[x.kind][0]} ×${x.qty}<div class="muted">${esc(x.s1)} ${x.kind==='set'?'＋'+esc(x.s2):''}</div></div><button data-remove="${i}">削除</button></div>`).join(''):'<p class="muted">商品を選択してください</p>';$('cart').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{if(checkoutInFlight||pendingCheckout)return;cart.splice(Number(b.dataset.remove),1);renderCart()});$('total').textContent=yen(total);const cash=pendingCheckout?.cash??Number($('cash').value);$('change').textContent=!pendingCheckout&&$('cash').value===''?'お釣り：—':cash>=total?'お釣り：'+yen(cash-total):'不足：'+yen(total-cash);$('checkout').textContent=pendingCheckout?'同じ取引を再試行':'会計を確定';$('checkout').disabled=!canWrite||busy||checkoutInFlight||!navigator.onLine||(!pendingCheckout&&(!cart.length||!$('operator').value||!Number.isSafeInteger(cash)||cash<total));$('checkPending').disabled=!pendingCheckout||checkoutInFlight||!navigator.onLine;$('operator').disabled=Boolean(pendingCheckout)||checkoutInFlight;$('cash').disabled=Boolean(pendingCheckout)||checkoutInFlight;$('pendingInfo').textContent=pendingCheckout?'確認待ち：'+pendingCheckout.id+' ／ '+pendingCheckout.operator+' ／ お預かり '+yen(pendingCheckout.cash):'';
+  $('cashKeypad').disabled = $('cash').disabled;
+  const hasCash = pendingCheckout || $('cash').value !== '';
+  const validCash = hasCash && Number.isSafeInteger(cash) && cash >= 0 ? cash : null;
+  showCustomer(logged ? (displayedCart.length
+    ? customerState(displayedCart, total, validCash)
+    : confirmedDisplay || customerState([], 0, null)) : null);
+}
 $('cash').oninput=renderCart;document.querySelectorAll('[data-cash]').forEach(b=>b.onclick=()=>{if(pendingCheckout||checkoutInFlight)return;$('cash').value=b.dataset.cash==='exact'?cart.reduce((n,x)=>n+kinds[x.kind][1]*x.qty,0):b.dataset.cash;renderCart()});
-$('clearCart').onclick=()=>{if(checkoutInFlight||pendingCheckout)return;cart=[];renderCart()};$('operatorLogout').onclick=()=>{if(checkoutInFlight||pendingCheckout)return;$('operator').value='';cart=[];$('cash').value='';renderCart();notice('販売担当者をログアウトしました')};
+$('clearCart').onclick=()=>{if(checkoutInFlight||pendingCheckout)return;confirmedDisplay=null;cart=[];renderCart()};$('operatorLogout').onclick=()=>{if(checkoutInFlight||pendingCheckout)return;$('operator').value='';confirmedDisplay=null;cart=[];$('cash').value='';renderCart();notice('販売担当者をログアウトしました')};
 async function refreshPos(){const [inventory,operators]=await Promise.all([records('inventory'),records('operators')]);const chosen=$('operator').value;$('operator').innerHTML='<option value="">担当者を選択</option>'+operators.sort((a,b)=>a.name.localeCompare(b.name,'ja')).map(o=>`<option value="${esc(o.name)}">${esc(o.name)}</option>`).join('');$('operator').value=chosen;$('operator').onchange=()=>{if(checkoutInFlight||pendingCheckout){notice('未確認の会計があるため担当者を変更できません',true);return}if(cart.length){cart=[];$('cash').value='';notice('担当者変更のためカートを初期化しました')}renderCart()};const map=Object.fromEntries(inventory.map(x=>[x.id,x.qty]));$('stockHint').textContent=Object.entries(required([{kind,s1,s2,qty:1}])).map(([k])=>`${k.replace('|','・')}：${map[k]||0}個`).join(' / ');renderCart()}
-$('addCart').onclick=()=>safeAction(async()=>{if(checkoutInFlight||pendingCheckout)throw Error('未確認の会計があります。先に会計状態を確認してください');const qty=Number($('qty').value);if(!validQty(qty)||qty>999)throw Error('数量が不正です');const item={kind,s1,s2,qty};const inv=Object.fromEntries((await records('inventory')).map(x=>[x.id,x.qty]));for(const [k,n] of Object.entries(required([...cart,item])))if((inv[k]||0)<n)throw Error(k+' の在庫が不足しています');cart.push(item);renderCart()});
+$('addCart').onclick=()=>safeAction(async()=>{if(checkoutInFlight||pendingCheckout)throw Error('未確認の会計があります。先に会計状態を確認してください');const qty=Number($('qty').value);if(!validQty(qty)||qty>999)throw Error('数量が不正です');const item={kind,s1,s2,qty};const inv=Object.fromEntries((await records('inventory')).map(x=>[x.id,x.qty]));for(const [k,n] of Object.entries(required([...cart,item])))if((inv[k]||0)<n)throw Error(k+' の在庫が不足しています');confirmedDisplay=null;cart.push(item);renderCart()});
 $('checkout').onclick = () => safeAction(async () => {
   if (!canWrite || busy || checkoutInFlight) return;
   ensureOnline();
@@ -213,7 +301,10 @@ $('checkout').onclick = () => safeAction(async () => {
 });
 
 function finishCheckout(message) {
+  const {items, total, cash} = pendingCheckout;
   savePending(null);
+  confirmedDisplay = customerState(items, total, cash, true);
+  showCustomer(confirmedDisplay);
   cart = [];
   $('cash').value = '';
   notice(message);
@@ -258,7 +349,31 @@ async function refreshExpenses(){const list=(await records('expenses')).sort((a,
 $('expenseForm').onsubmit=e=>{e.preventDefault();safeAction(async()=>{const date=$('exDate').value,category=$('exCategory').value,description=$('exDescription').value.trim(),payer=$('exPayer').value.trim(),amount=Number($('exAmount').value),paid=$('exPaid').value==='true';if(!date||!description||!payer||!Number.isSafeInteger(amount)||amount<1||amount>99999999)throw Error('入力を確認してください');await setDoc(doc(collection(db,'expenses')),{date,category,description,payer,amount,paid,createdAt:now()});$('exDescription').value='';$('exAmount').value='';notice('経費を保存しました');await refreshExpenses()})};
 async function refreshOperators(){const list=await records('operators');$('operatorTable').innerHTML=table(['担当者','操作'],list.map(x=>[esc(x.name),`<button data-remove-operator="${esc(x.id)}">削除</button>`]));$('operatorTable').querySelectorAll('[data-remove-operator]').forEach(b=>b.onclick=()=>safeAction(async()=>{if(!confirm('担当者を削除しますか？ 過去の売上は残ります。'))return;await deleteDoc(doc(db,'operators',b.dataset.removeOperator));await refreshOperators()}))}
 $('operatorForm').onsubmit=e=>{e.preventDefault();safeAction(async()=>{const name=$('newOperator').value.trim();if(!name||name.length>40)throw Error('担当者名を入力してください');await setDoc(doc(db,'operators',encodeURIComponent(name)),{name});$('newOperator').value='';await refreshOperators()})};
-for(const target of ['prodScent','coScent'])$(target).innerHTML=scents.map(s=>`<option>${s}</option>`).join('');for(const target of ['prodDate','coDate','payDate','exDate'])$(target).value=today();drawScents();renderCart();function network(){const online=navigator.onLine;$('network').textContent=online?'● オンライン':'● オフライン';renderCart()}window.addEventListener('online',network);window.addEventListener('offline',network);network();
+for(const target of ['prodScent','coScent'])$(target).innerHTML=scents.map(s=>`<option>${s}</option>`).join('');for(const target of ['prodDate','coDate','payDate','exDate'])$(target).value=today();drawScents();renderCart();
+function updateNetworkStatus() {
+  const online = navigator.onLine;
+  const badge = $('network');
+  badge.textContent = online ? '● オンライン' : '● オフライン';
+  badge.classList.toggle('is-online', online);
+  renderCart();
+}
+window.addEventListener('online', updateNetworkStatus);
+window.addEventListener('offline', updateNetworkStatus);
+updateNetworkStatus();
+
+const clockFormat = new Intl.DateTimeFormat('ja-JP', {
+  hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+  timeZone: 'Asia/Tokyo'
+});
+function updateRegisterClock() {
+  const current = new Date();
+  const clock = $('registerClock');
+  clock.textContent = clockFormat.format(current);
+  clock.dateTime = current.toISOString();
+}
+updateRegisterClock();
+setInterval(updateRegisterClock, 1000);
+
 
 
 // 管理者向けの全データJSONバックアップ。秘密情報（ログインパスワード）は含まない。
